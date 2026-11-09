@@ -1,5 +1,7 @@
 #include "fw_hal.h"
 
+#define SLICE_MS  5   // time slice for checking button state inside delay
+
 volatile uint8_t pressed = 0;   // state of the button - only set from INT0 interrupt
 
 // On STC8G/STC8H family external interrupt INT0 is mapped to pin P3.2 (the button).
@@ -33,6 +35,20 @@ void EXTI_Init(void)
     EXTI_Global_SetIntState(HAL_State_ON); // enable global interrupts (EA)
 }
 
+// Interruptible delay: SYS_Delay is called in small slices, so a button event (pressed flag
+// set by the interrupt) breaks it as soon as possible - mode changes without waiting.
+void Delay_Interruptible(uint16_t ms)
+{
+    uint8_t state = pressed;
+
+    while (ms >= SLICE_MS)
+    {
+        SYS_Delay(SLICE_MS);
+        ms -= SLICE_MS;
+        if (pressed != state) break;   // button event - interrupt the delay early
+    }
+}
+
 int main(void)
 {
     GPIO_Init();
@@ -40,12 +56,13 @@ int main(void)
 
     while(1)
     {
-        uint8_t period = pressed ? 100 : 1000;   // fast blink while held, slow otherwise
+        uint8_t period = pressed ? 100 : 1000;   // fast blink when held, slow otherwise
 
-        P55 = RESET;
-        SYS_Delay(period);
+        P55 = RESET;      // LED on
+        Delay_Interruptible(period);
 
+        period = pressed ? 100 : 1000;   // re-read: mode may have changed while waiting
         P55 = SET;
-        SYS_Delay(period);
+        Delay_Interruptible(period);
     }
 }
