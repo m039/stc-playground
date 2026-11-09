@@ -10,13 +10,13 @@ INTERRUPT(Button_Routine, EXTI_VectInt0)
 {
     if (P32 == RESET)   // falling edge - pressed
     {
-        P55 = RESET;    // change LED state immediately, right in the interrupt
+        P55 = SET;      // change LED state immediately, right in the interrupt
         pressed = 1;
     }
     else                // rising edge - released
     {
         pressed = 0;
-        P55 = SET;
+        P55 = RESET;
     }
 }
 
@@ -58,11 +58,11 @@ int main(void)
     {
         uint8_t period = pressed ? 100 : 1000;   // fast blink when held, slow otherwise
 
-        P55 = RESET;      // LED on
+        P55 = RESET;      // LED off
         Delay_Interruptible(period);
 
         period = pressed ? 100 : 1000;   // re-read: mode may have changed while waiting
-        P55 = SET;
+        P55 = SET;        // LED on
         Delay_Interruptible(period);
     }
 }
