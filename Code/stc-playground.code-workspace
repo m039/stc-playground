@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "blink"
+		},
+		{
+			"path": "button"
 		}
 	],
 	"settings": {}
