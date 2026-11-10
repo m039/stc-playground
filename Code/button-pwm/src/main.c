@@ -57,14 +57,19 @@ int main(void)
 
         if(rising)
         {
-            brightness += step;                 // fade in
-            if(brightness >= 255)               // reached full on: turn to the fading-out phase
+            // Compare BEFORE truncation: uint8_t + uint8_t is promoted to int, so a step that would
+            // wrap around (e.g. 254+2 -> 0) clamps to full on instead of skipping the fade-out phase
+            if(brightness + step >= 255)        // reached full on: turn to the fading-out phase
             {
                 brightness = 255;
                 rising   = 0;
             }
+            else
+            {
+                brightness += step;             // fade in (no wraparound possible here)
+            }
         }
-        else if(brightness > step)
+        else if(brightness > step)              // same step as the fade-in - equal speed both ways
         {
             brightness -= step;                 // fade out
         }
