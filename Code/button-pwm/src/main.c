@@ -1,10 +1,11 @@
 #include "fw_hal.h"
 
 #define TICK_MS     20    // main loop period - button is re-read and LED duty updated each tick
-#define STEP_SLOW   2     // duty step per tick when the button is released (full fade-out ~ 2.6 s)
-#define STEP_FAST   16    // duty step per tick while the button is pressed  (full fade-out ~ 0.3 s)
+#define STEP_SLOW   2     // duty step per tick when the button is released (one phase, fade-in or fade-out, ~ 2.6 s)
+#define STEP_FAST   16    // duty step per tick while the button is pressed  (one phase ~ 0.3 s)
 
-uint8_t brightness = 255;   // LED duty, 0..255 - unsigned underflow wraps to full on and restarts the cycle
+uint8_t brightness = 0;   // LED duty, 0..255 - breathing triangle wave between these limits
+uint8_t rising   = 1;     // direction of the current phase: 1 - fading in, 0 - fading out
 
 void GPIO_Init(void)
 {
@@ -35,7 +36,7 @@ void PCA_Init(void)
     PCA_PCA2_SetWorkMode(PCA_WorkMode_PWM_NonInterrupt);
     PCA_PWM2_SetBitWidth(PCA_PWM_BitWidth_8);
 
-    // Initial state - LED fully on (the cycle restarts here after underflow)
+    // Initial state - LED off, cycle starts with a smooth fade-in
     PCA_PCA2_SetCompareValue(brightness);
 
     // STC8G1K08A port option 2: CCP2 -> P5.5 (ECI/CCP0/CCP1 are moved to unused pins)
@@ -52,10 +53,28 @@ int main(void)
 
     while(1)
     {
-        uint8_t step = (P32 == RESET) ? STEP_FAST : STEP_SLOW;   // button pressed - fade out faster
+        uint8_t step = (P32 == RESET) ? STEP_FAST : STEP_SLOW;   // button pressed - whole cycle runs faster
 
-        brightness -= step;                        // unsigned underflow wraps back near full on - cycle restarts
-        PCA_PCA2_ChangeCompareValue(brightness);   // change duty while PWM is running
+        if(rising)
+        {
+            brightness += step;                 // fade in
+            if(brightness >= 255)               // reached full on: turn to the fading-out phase
+            {
+                brightness = 255;
+                rising   = 0;
+            }
+        }
+        else if(brightness > step)
+        {
+            brightness -= step;                 // fade out
+        }
+        else                                    // faded out completely: turn back to the fading-in phase
+        {
+            brightness = 0;
+            rising   = 1;
+        }
+
+        PCA_PCA2_ChangeCompareValue(brightness);    // change duty while PWM is running
 
         SYS_Delay(TICK_MS);
     }
