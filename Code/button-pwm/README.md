@@ -17,7 +17,8 @@ STC8G1K17A (IRC 11.0592 MHz, HAL FwLib_STC8) — плавное свечение
 | P3.2 | Вход кнопки; внутренний pull-up включён; низкий уровень = нажата (опрос в цикле) | Input, high-impedance |
 | P5.5 | Выход на светодиод: ШИМ PCA канал 2 (`CCP2`) | Output, push-pull |
 
-Сборка/загрузка: `pio run -t upload`.
+## Сборка / загрузка
+`pio run -t upload`.
 
 ---
 
