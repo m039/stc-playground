@@ -4,10 +4,11 @@
 #define STEP_SLOW   2     // duty step per tick when the button is released (one phase, fade-in or fade-out, ~ 2.6 s)
 #define STEP_FAST   16    // duty step per tick while the button is pressed  (one phase ~ 0.3 s)
 
-/* The CCP2 output on P5.5 of this board (STC8G1K08A port option ..._P31_P32_P33_P55) is inverted w.r.t. CCAP2H -
-   measured on the hardware: effective duty = 1 - CCAP2H/256, i.e. full on at CCAP2H=0 and off at CCAP2H=255
-   (vendor docs/demos do not document it). `brightness` stays intuitive [0..255] (0 = off); the conversion to
-   the compare value is done in this single place: */
+/* STC8G PCA PWM output is LOW while the counter < compare value {EPCnL,CCAP2H} and HIGH otherwise - so in 8-bit
+   mode effective duty = 1 - CCAP2H/256 (full on at CCAP2H=0, off at CCAP2H=255). This is documented behavior
+   (STC8G datasheet section 17.2.4 "PWM mode") and matches the hardware measurement; there is no polarity bit in
+   CCAPMn/PCA_PWMn to invert it, and the vendor FwLib demo does exactly this software trick (~dc). `brightness`
+   stays intuitive [0..255] (0 = off); the conversion to the compare value is done in this single place: */
 #define CCP_VALUE(b)  ((b) == 0 ? 255 : (uint8_t)(256 - (b)))
 
 uint8_t brightness = 0;   // LED duty, 0..255 - breathing triangle wave between these limits
@@ -38,7 +39,7 @@ void PCA_Init(void)
     // remapped to CCP0 by the port option below - keep plain GPIO behaviour for the button input.
     PCA_PCA0_SetWorkMode(PCA_WorkMode_None);
     PCA_PCA1_SetWorkMode(PCA_WorkMode_None);
-    // Channel 2: 8-bit PWM mode, no interrupt (effective duty is inverted w.r.t. CCAP2H on this board - see CCP_VALUE)
+    // Channel 2: 8-bit PWM mode, no interrupt (output HIGH while counter >= compare value - see CCP_VALUE)
     PCA_PCA2_SetWorkMode(PCA_WorkMode_PWM_NonInterrupt);
     PCA_PWM2_SetBitWidth(PCA_PWM_BitWidth_8);
 
