@@ -13,7 +13,7 @@ int main(void)
     {
         P55 = RESET;
 
-        SYS_Delay(100);
+        SYS_Delay(1000);
 
         P55 = SET;
 
