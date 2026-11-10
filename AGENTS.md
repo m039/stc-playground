@@ -40,7 +40,7 @@
 | `Code/blink/` | Базовый пример мигания светодиода на **P5.5** (проект PlatformIO, MCU **STC8G1K17A**, IRC 11.0592 MHz). Пользовательский код — `src/main.c`, определение платы — `boards/STC8G1K17AX.json` |
 | `Code/blink/lib/FwLib_STC8/` | HAL-библиотека FwLib_STC8: заголовки `include/fw_*.h`, исходники `src/fw_*.c` и эталонные примеры по модулям (`demo/`: adc, clock, gpio, i2c, iap, mem, pca, pwm, rtc, spi, tim, uart, usb, wdt) — источник для новых задач |
 | `Code/button/` | Кнопка на P3.2 через внешнее прерывание INT0: реакция сразу в ISR, быстрое мигание при удержании / медленное при отпускании (проект PlatformIO) |
-| `Code/button-pwm/` | ШИМ-«дыхание» PCA2 на P5.5 (8-bit, ~43 кГц), кнопка P3.2 переключает скорость цикла (проект PlatformIO) |
+| `Code/button-pwm/` | Плавное свечение яркости: ШИМ PCA2 на P5.5 (8-bit, ~43 кГц), кнопка P3.2 переключает скорость цикла (проект PlatformIO) |
 | `PCB/` | Печатная плата STC8G1K017A_Devboard: проект EasyEDA Pro (`.eprj2`), превью платы и схемы (`img/`), README |
 | `Docs/` | Вендорская документация: «STC8G-8H 库函数使用说明» (PDF), даташит STC8G (EN), архив демо-кода от вендора |
 
