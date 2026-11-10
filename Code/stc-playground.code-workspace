@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "button"
+		},
+		{
+			"path": "button-pwm"
 		}
 	],
 	"settings": {}
