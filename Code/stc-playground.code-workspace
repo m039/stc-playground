@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "button-pwm"
+		},
+		{
+			"path": "blink-asm"
 		}
 	],
 	"settings": {}
