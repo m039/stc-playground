@@ -2,6 +2,8 @@
 
 Дизайн печатной платы отладочного модуля **STC8G1K017A** (`STC8G1K017A_Devboard/STC8G1K017A_Devboard.eprj2`).
 
+![STC8G1K017A_Devboard](img/stc8g1k17a_devboard.jpg)
+
 ## Печатная плата (PCB layout)
 
 ![Печатная плата STC8G1K017A_Devboard](img/board.webp)
